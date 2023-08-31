@@ -1,28 +1,74 @@
-import React, { useState } from "react";
-import axios from "axios";
-import "./styles.css";
+import React,{useState,useEffect} from "react";
+import { BrowserRouter as Router,Routes, Route, Link } from "react-router-dom";
+import axios from 'axios';
+import './App.css';
 
-function Searcher() {
-  const [movie, setMovie] = useState([]);
+const Movies = () => {
+  let uRef=React.createRef();
+  const [movies,setMovies] = useState([]);
+  const getMovies = () => {
+    axios.get("http://www.omdbapi.com/?s=" + movies + "&apikey=4b38bf9d&type=movie")
+    .then((res)=>{
+      if (res){
+        console.log(res.data);
+      }
+    })
+  }
+  const handle = (e) => {
+    e.preventDefault();
+    getMovies();
+  }
+  return (
+    <div>
+      <div className="form">
+        <form>
+          <input type="text" onChange={(event) => setMovies(event.target.value) }/>
+          <button type='submit' onClick={(e) => handle(e)}>Найти</button>
+        </form>
+      </div>
+      {movies ?
+      <div>
+        {movies.map(movie => (
+          <div>
+            <img src={movie.Poster} alt=""/>
+            <h1>{movie.Title}</h1>
+            <p>{movie.Year}</p>
+          </div>
+        ))}
+      </div>
+      : null}
+    </div>
+  )
+}
+
+/*function Searcher() {
   let uRef = React.createRef();
-  const handlerClick = () => {
+  let movie;
+  const handler=()=>{
     axios
       .get(
         "http://www.omdbapi.com/?s=" + uRef.current.value + "&apikey=4b38bf9d"
       )
       .then((response) => {
-        setMovie(response.data.Search);
-      });
-  };
+        movie=response.data.Search;
+        console.log(movie);
+    });
+  }
   return (
     <div className="App">
-      <div>
-        <form onSubmit={handlerClick}>
+        <form action={handler}>
           <label htmlFor="film">Введите название фильма</label>
           <input type="text" name="film" id="name" ref={uRef} />
-          <input type="submit" value="Найти" />
+          <Link to="/about" className="links" component={Show} film={movie}>Найти</Link>
         </form>
-      </div>
+    </div>
+  );
+}
+
+function Show(props){
+  let movie=props.film;
+  return(
+    <div>
       {movie.map((value, index) => {
         return (
           <>
@@ -36,10 +82,15 @@ function Searcher() {
   );
 }
 
+function NotFound() {
+  return <h2>Not found</h2>;
+}*/
+
 export default function App() {
   return (
     <div className="App">
-      <Searcher />
+      <Movies />
     </div>
   );
 }
+
